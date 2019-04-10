@@ -5,6 +5,8 @@ import { catchError } from 'rxjs/operators';
 import { MatSnackBar, MatDialog } from '@angular/material';
 import { MessageComponent } from './message.component';
 
+import Pusher from 'pusher-js';
+
 export interface MessageData {
   author: string,
   content: string
@@ -18,6 +20,7 @@ export interface MessageData {
 export class AppComponent implements OnInit {
   title = 'testui';
   private headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  private pusherId = null;
   messages: MessageData[] = [];
 
   constructor(
@@ -38,6 +41,18 @@ export class AppComponent implements OnInit {
     ).subscribe((data: MessageData[]) => {
       this.messages = data;
     });
+    let pusher= new Pusher('99aa5a832d330c77e5a3', {cluster: 'us2', forceTLS: true});
+    let me = this;
+    pusher.connection.bind('connected', function() {
+      me.pusherId = pusher.connection.socket_id;
+    });
+    let channel = pusher.subscribe('redhat-demo');
+    channel.bind('new-message', function(msg) {
+      me.snackBar.open('Received new message!', '', {
+        duration: 2000,
+      });
+      me.messages.push(msg);
+    });
   }
 
   add() {
@@ -47,6 +62,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((message: MessageData) => {
       if (message) {
+        message = Object.assign({ping: this.pusherId}, message);
         this.http.post<any>(`/message`, message, {
           headers: this.headers,
           observe: 'body',
@@ -57,7 +73,7 @@ export class AppComponent implements OnInit {
               this.snackBar.open('Comment saved!', '', {
                 duration: 2000,
               });
-              this.messages.unshift(result.message);
+              this.messages.push(result.message);
             } else {
               this.snackBar.open('Failed, please try again!', '', {
                 duration: 3000,
