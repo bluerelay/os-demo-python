@@ -1,0 +1,17 @@
+<form (ngSubmit)="onSubmit()" #messageForm="ngForm">
+    <div>
+      <mat-form-field>
+        <textarea matInput maxlength="2046" [(ngModel)]="message.content" id="message-content" name="content" placeholder="Message" required></textarea>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field>
+        <input matInput type="text" [(ngModel)]="message.author" id="message-author" name="author" placeholder="Name" required>
+      </mat-form-field>
+    </div>
+  
+    <div>
+      <button mat-raised-button color="primary" type="submit" [disabled]="!messageForm.form.valid">Submit</button>
+      <button mat-raised-button (click)="onCancel()" type="button">Cancel</button>
+    </div>
+</form>

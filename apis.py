@@ -1,8 +1,21 @@
 from sanic.response import json
 
-async def hello(request):
-    msg = 'hello world'
-    return json({'message': msg})
+
+from psql import db
+
+async def get_messages(request):
+    query = db.table('messages').select('author', 'content')
+    messages = await query
+    messages = [dict(m) for m in messages]
+    return json(messages)
+
+async def save_message(request):
+    message = {
+        'author': request.json['author'],
+        'content': (request.json['content'][:2000] + '...') if len(request.json['content']) > 2000 else request.json['content']
+    }
+    await db.table('messages').insert(message)
+    return json({'success': True, 'message': message})
 
 async def health(request):
     return json({'success': True})

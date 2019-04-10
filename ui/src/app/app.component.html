@@ -1,2 +1,13 @@
-<button mat-raised-button color="primary" (click)="hello()">Hello</button>
-<div>{{message}}</div>
+<div id="main">
+    <button mat-raised-button color="primary" (click)="add()">Leave a message</button>
+
+    <mat-list>
+        <ng-container *ngFor="let msg of messages">
+            <mat-divider></mat-divider>
+            <mat-list-item>
+              <p mat-line><span class="message-author">{{msg.author}}</span></p>
+              <p mat-line class="message-content">{{msg.content}}</p>
+            </mat-list-item>
+        </ng-container>
+    </mat-list>
+</div>

@@ -6,7 +6,8 @@ import apis
 
 
 routes = Blueprint('routes')
-routes.add_route(handler=apis.hello, uri='/hello', methods=['GET'])
+routes.add_route(handler=apis.get_messages, uri='/messages', methods=['GET'])
+routes.add_route(handler=apis.save_message, uri='/message', methods=['POST'])
 routes.add_route(handler=apis.health, uri='/health', methods=['GET'])
 # ui
 routes.static('/', './ui/dist', name='ui')
